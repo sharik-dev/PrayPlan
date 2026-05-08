@@ -6,10 +6,14 @@ struct SegmentBadge: View {
     var body: some View {
         Label(segment.displayName, systemImage: segment.systemIcon)
             .font(.caption.weight(.semibold))
-            .foregroundStyle(segment.color)
+            .foregroundStyle(segment.bandColor)
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
-            .background(segment.color.opacity(0.1))
+            .background(
+                Capsule()
+                    .fill(segment.softFill)
+                    .overlay(Capsule().strokeBorder(segment.softStroke, lineWidth: 1))
+            )
             .clipShape(Capsule())
     }
 }

@@ -26,6 +26,14 @@ let kGoalThemes: [GoalThemePreset] = [
     .init(name: "Méditation",     icon: "brain.head.profile",         hex: "#4527A0"),
 ]
 
+let kCustomThemeIcons: [String] = [
+    "sparkles", "star.fill", "moon.stars.fill", "sun.max.fill",
+    "heart.fill", "leaf.fill", "book.fill", "pencil.and.scribble",
+    "briefcase.fill", "figure.run", "dumbbell.fill", "paintbrush.fill",
+    "music.note", "camera.fill", "fork.knife", "house.fill",
+    "person.2.fill", "brain.head.profile", "flame.fill", "target"
+]
+
 // MARK: – Main view
 
 struct GoalsView: View {
@@ -291,6 +299,10 @@ struct GoalEditSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var showThemePicker = false
+    @State private var showCustomThemeEditor = false
+    @State private var customThemeName = ""
+    @State private var customThemeIcon = "sparkles"
+    @State private var customThemeColor = Color.brandGreen
     @FocusState private var focusedRule: Int?
 
     var body: some View {
@@ -306,6 +318,7 @@ struct GoalEditSheet: View {
             }
             .navigationTitle(goal.segment.displayName)
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear { hydrateCustomThemeState() }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("OK") {
@@ -347,7 +360,9 @@ struct GoalEditSheet: View {
 
     private var themeSection: some View {
         Section("Thème principal") {
-            if showThemePicker {
+            if showCustomThemeEditor {
+                customThemeEditor
+            } else if showThemePicker {
                 themePicker
             } else {
                 themePickerButton
@@ -391,6 +406,34 @@ struct GoalEditSheet: View {
                 columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4),
                 spacing: 12
             ) {
+                Button {
+                    withAnimation(.spring(duration: 0.25)) {
+                        hydrateCustomThemeState()
+                        showThemePicker = false
+                        showCustomThemeEditor = true
+                    }
+                } label: {
+                    VStack(spacing: 6) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 11)
+                                .fill(Color.brandGreen.opacity(0.12))
+                                .frame(width: 46, height: 46)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 11)
+                                        .strokeBorder(Color.brandGreen.opacity(0.35), style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
+                                )
+                            Image(systemName: "plus")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(Color.brandGreen)
+                        }
+                        Text("Custom")
+                            .font(.system(size: 9, weight: .medium))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+                .buttonStyle(.plain)
+
                 ForEach(kGoalThemes) { preset in
                     Button {
                         withAnimation(.spring(duration: 0.2)) {
@@ -427,6 +470,91 @@ struct GoalEditSheet: View {
             }
             .padding(.vertical, 10)
         }
+    }
+
+    private var customThemeEditor: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(customThemeColor.opacity(0.16))
+                        .frame(width: 58, height: 58)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .strokeBorder(customThemeColor.opacity(0.28), lineWidth: 1)
+                        )
+                    Image(systemName: customThemeIcon)
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(customThemeColor)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    TextField("Nom du thème", text: $customThemeName)
+                        .font(.subheadline.weight(.semibold))
+                    Text("Choisis un nom, une icône Apple et une couleur.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Couleur")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                ColorPicker("Couleur du thème", selection: $customThemeColor, supportsOpacity: false)
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Icône")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5), spacing: 10) {
+                    ForEach(kCustomThemeIcons, id: \.self) { icon in
+                        Button {
+                            customThemeIcon = icon
+                        } label: {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(icon == customThemeIcon ? customThemeColor.opacity(0.16) : Color(.tertiarySystemFill))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .strokeBorder(icon == customThemeIcon ? customThemeColor.opacity(0.35) : Color.clear, lineWidth: 1.5)
+                                    )
+                                Image(systemName: icon)
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundStyle(icon == customThemeIcon ? customThemeColor : .secondary)
+                            }
+                            .frame(height: 46)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+
+            HStack(spacing: 10) {
+                Button("Annuler") {
+                    withAnimation(.spring(duration: 0.22)) {
+                        showCustomThemeEditor = false
+                        showThemePicker = true
+                    }
+                }
+                .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Button("Appliquer") {
+                    goal.themeName = customThemeName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Thème perso" : customThemeName.trimmingCharacters(in: .whitespacesAndNewlines)
+                    goal.themeIcon = customThemeIcon
+                    goal.themeColorHex = customThemeColor.hexString
+                    withAnimation(.spring(duration: 0.22)) {
+                        showCustomThemeEditor = false
+                    }
+                }
+                .bold()
+                .disabled(customThemeIcon.isEmpty)
+            }
+        }
+        .padding(.vertical, 8)
     }
 
     private var intentionSection: some View {
@@ -511,6 +639,12 @@ struct GoalEditSheet: View {
             }
         )
     }
+
+    private func hydrateCustomThemeState() {
+        customThemeName = goal.themeName
+        customThemeIcon = goal.themeIcon.isEmpty ? "sparkles" : goal.themeIcon
+        customThemeColor = goal.themeColor
+    }
 }
 
 // MARK: – SegmentGoal SwiftUI helpers
@@ -531,6 +665,21 @@ private extension Color {
             red:   Double((v >> 16) & 0xFF) / 255,
             green: Double((v >> 8)  & 0xFF) / 255,
             blue:  Double(v & 0xFF)         / 255
+        )
+    }
+
+    var hexString: String {
+        let uiColor = UIColor(self)
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        return String(
+            format: "#%02X%02X%02X",
+            Int(red * 255),
+            Int(green * 255),
+            Int(blue * 255)
         )
     }
 }

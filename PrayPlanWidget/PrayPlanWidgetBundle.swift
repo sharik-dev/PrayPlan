@@ -12,6 +12,8 @@ import SwiftUI
 struct PrayPlanWidgetBundle: WidgetBundle {
     var body: some Widget {
         PrayPlanWidget()
+        CurrentGoalWidget()
+        PeriodActivitiesWidget()
         PrayPlanWidgetLiveActivity()
     }
 }

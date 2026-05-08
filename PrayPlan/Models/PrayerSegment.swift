@@ -110,12 +110,12 @@ struct DailyPrayerSchedule {
 }
 
 extension Color {
-    static let fajrColor    = Color(red: 0.12, green: 0.15, blue: 0.55)   // deep cobalt
-    static let sunriseColor = Color(red: 0.78, green: 0.26, blue: 0.02)   // rich burnt sienna
-    static let dhuhrColor   = Color(red: 0.70, green: 0.44, blue: 0.00)   // deep amber
-    static let asrColor     = Color(red: 0.85, green: 0.54, blue: 0.05)   // warm gold
-    static let maghribColor = Color(red: 0.44, green: 0.08, blue: 0.60)   // rich violet
-    static let ishaColor    = Color(red: 0.07, green: 0.07, blue: 0.22)   // deep midnight
+    static let fajrColor    = Color(red: 0.28, green: 0.37, blue: 0.63)
+    static let sunriseColor = Color(red: 0.78, green: 0.47, blue: 0.29)
+    static let dhuhrColor   = Color(red: 0.77, green: 0.60, blue: 0.28)
+    static let asrColor     = Color(red: 0.82, green: 0.58, blue: 0.33)
+    static let maghribColor = Color(red: 0.58, green: 0.37, blue: 0.63)
+    static let ishaColor    = Color(red: 0.24, green: 0.27, blue: 0.44)
     static let brandGreen   = Color(red: 0.18, green: 0.49, blue: 0.20)
 }
 
@@ -123,28 +123,36 @@ extension PrayerSegment {
     var bannerGradient: LinearGradient {
         switch self {
         case .fajrToSunrise:
-            return LinearGradient(colors: [Color(red: 0.08, green: 0.10, blue: 0.42), Color(red: 0.20, green: 0.26, blue: 0.70)], startPoint: .leading, endPoint: .trailing)
+            return LinearGradient(colors: [Color(red: 0.23, green: 0.29, blue: 0.50), Color(red: 0.40, green: 0.51, blue: 0.76)], startPoint: .topLeading, endPoint: .bottomTrailing)
         case .sunriseToDhuhr:
-            return LinearGradient(colors: [Color(red: 0.70, green: 0.22, blue: 0.00), Color(red: 0.95, green: 0.42, blue: 0.06)], startPoint: .leading, endPoint: .trailing)
+            return LinearGradient(colors: [Color(red: 0.66, green: 0.37, blue: 0.19), Color(red: 0.90, green: 0.63, blue: 0.36)], startPoint: .topLeading, endPoint: .bottomTrailing)
         case .dhuhrToAsr:
-            return LinearGradient(colors: [Color(red: 0.62, green: 0.38, blue: 0.00), Color(red: 0.88, green: 0.58, blue: 0.06)], startPoint: .leading, endPoint: .trailing)
+            return LinearGradient(colors: [Color(red: 0.64, green: 0.49, blue: 0.20), Color(red: 0.90, green: 0.73, blue: 0.43)], startPoint: .topLeading, endPoint: .bottomTrailing)
         case .asrToMaghrib:
-            return LinearGradient(colors: [Color(red: 0.80, green: 0.48, blue: 0.00), Color(red: 1.00, green: 0.72, blue: 0.10)], startPoint: .leading, endPoint: .trailing)
+            return LinearGradient(colors: [Color(red: 0.71, green: 0.49, blue: 0.24), Color(red: 0.91, green: 0.72, blue: 0.45)], startPoint: .topLeading, endPoint: .bottomTrailing)
         case .maghribToIsha:
-            return LinearGradient(colors: [Color(red: 0.36, green: 0.04, blue: 0.52), Color(red: 0.62, green: 0.14, blue: 0.80)], startPoint: .leading, endPoint: .trailing)
+            return LinearGradient(colors: [Color(red: 0.45, green: 0.27, blue: 0.52), Color(red: 0.73, green: 0.48, blue: 0.74)], startPoint: .topLeading, endPoint: .bottomTrailing)
         case .ishaTofajr:
-            return LinearGradient(colors: [Color(red: 0.04, green: 0.04, blue: 0.16), Color(red: 0.12, green: 0.12, blue: 0.32)], startPoint: .leading, endPoint: .trailing)
+            return LinearGradient(colors: [Color(red: 0.18, green: 0.20, blue: 0.34), Color(red: 0.34, green: 0.37, blue: 0.55)], startPoint: .topLeading, endPoint: .bottomTrailing)
         }
     }
 
     var bandColor: Color {
         switch self {
-        case .fajrToSunrise:  return Color(red: 0.12, green: 0.15, blue: 0.55)
-        case .sunriseToDhuhr: return Color(red: 0.78, green: 0.26, blue: 0.02)
-        case .dhuhrToAsr:     return Color(red: 0.70, green: 0.44, blue: 0.00)
-        case .asrToMaghrib:   return Color(red: 0.85, green: 0.54, blue: 0.05)
-        case .maghribToIsha:  return Color(red: 0.44, green: 0.08, blue: 0.60)
-        case .ishaTofajr:     return Color(red: 0.07, green: 0.07, blue: 0.22)
+        case .fajrToSunrise:  return Color(red: 0.33, green: 0.43, blue: 0.68)
+        case .sunriseToDhuhr: return Color(red: 0.84, green: 0.56, blue: 0.34)
+        case .dhuhrToAsr:     return Color(red: 0.82, green: 0.67, blue: 0.35)
+        case .asrToMaghrib:   return Color(red: 0.85, green: 0.62, blue: 0.38)
+        case .maghribToIsha:  return Color(red: 0.63, green: 0.44, blue: 0.69)
+        case .ishaTofajr:     return Color(red: 0.30, green: 0.34, blue: 0.52)
         }
+    }
+
+    var softFill: Color {
+        bandColor.opacity(0.14)
+    }
+
+    var softStroke: Color {
+        bandColor.opacity(0.28)
     }
 }

@@ -5,6 +5,7 @@ struct TasksView: View {
     @Query(sort: \UserTask.createdAt, order: .reverse) private var tasks: [UserTask]
     @Environment(\.modelContext) private var context
     @State private var showingAdd = false
+    @State private var editingTask: UserTask? = nil
     @State private var segmentFilter: PrayerSegment? = nil
     @State private var showCompleted = false
 
@@ -36,7 +37,11 @@ struct TasksView: View {
                         ForEach(grouped, id: \.0) { segment, items in
                             Section {
                                 ForEach(items) { task in
-                                    TaskRowView(task: task) { toggle(task) }
+                                    TaskRowView(
+                                        task: task,
+                                        onToggle: { toggle(task) },
+                                        onEdit: { editingTask = task }
+                                    )
                                 }
                                 .onDelete { delete(items: items, offsets: $0) }
                             } header: {
@@ -68,6 +73,9 @@ struct TasksView: View {
                 }
             }
             .sheet(isPresented: $showingAdd) { AddTaskView() }
+            .sheet(item: $editingTask) { task in
+                EditTaskView(task: task)
+            }
         }
     }
 
@@ -84,16 +92,10 @@ struct TasksView: View {
 struct TaskRowView: View {
     let task: UserTask
     let onToggle: () -> Void
+    let onEdit: () -> Void
 
     var body: some View {
         HStack(spacing: 12) {
-            Button(action: onToggle) {
-                Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                    .font(.title3)
-                    .foregroundStyle(task.isCompleted ? Color.brandGreen : .secondary)
-            }
-            .buttonStyle(.plain)
-
             VStack(alignment: .leading, spacing: 3) {
                 Text(task.title)
                     .strikethrough(task.isCompleted)
@@ -115,11 +117,25 @@ struct TaskRowView: View {
 
             Spacer()
 
-            Image(systemName: task.priority.icon)
-                .font(.caption)
-                .foregroundStyle(task.priority == .high ? .red : task.priority == .medium ? .blue : .secondary)
+            HStack(spacing: 10) {
+                Image(systemName: task.priority.icon)
+                    .font(.caption)
+                    .foregroundStyle(task.priority == .high ? .red : task.priority == .medium ? .blue : .secondary)
+
+                Button(action: onEdit) {
+                    Image(systemName: "pencil")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 28, height: 28)
+                        .background(Color(.tertiarySystemFill))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                .buttonStyle(.plain)
+            }
         }
         .padding(.vertical, 2)
+        .contentShape(Rectangle())
+        .onTapGesture(perform: onToggle)
     }
 }
 
@@ -194,5 +210,87 @@ struct AddTaskView: View {
         )
         context.insert(task)
         dismiss()
+    }
+}
+
+struct EditTaskView: View {
+    @Bindable var task: UserTask
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
+
+    @State private var hasDate = false
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section(String(localized: "addTask.section.info", defaultValue: "Informations")) {
+                    TextField(String(localized: "addTask.title", defaultValue: "Titre"), text: $task.title)
+                    TextField(String(localized: "addTask.notes", defaultValue: "Notes"), text: $task.notes, axis: .vertical)
+                        .lineLimit(3)
+                }
+
+                Section(String(localized: "addTask.section.segment", defaultValue: "Bloc de prière")) {
+                    Picker(String(localized: "addTask.segment", defaultValue: "Segment"), selection: $task.segment) {
+                        ForEach(PrayerSegment.allCases) { seg in
+                            Label(seg.displayName, systemImage: seg.systemIcon)
+                                .tag(seg)
+                        }
+                    }
+                    .pickerStyle(.navigationLink)
+                }
+
+                Section(String(localized: "addTask.section.priority", defaultValue: "Priorité")) {
+                    Picker(String(localized: "addTask.priority", defaultValue: "Priorité"), selection: $task.priority) {
+                        ForEach(TaskPriority.allCases) { p in
+                            Label(p.displayName, systemImage: p.icon).tag(p)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                Section(String(localized: "addTask.section.date", defaultValue: "Échéance")) {
+                    Toggle(String(localized: "addTask.hasDate", defaultValue: "Date limite"), isOn: $hasDate)
+                    if hasDate {
+                        DatePicker("", selection: dueDateBinding, displayedComponents: .date)
+                            .datePickerStyle(.graphical)
+                    }
+                }
+
+                Section {
+                    Button("Supprimer la tâche", role: .destructive) {
+                        context.delete(task)
+                        dismiss()
+                    }
+                }
+            }
+            .navigationTitle("Modifier la tâche")
+            .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                hasDate = task.dueDate != nil
+            }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(String(localized: "button.cancel", defaultValue: "Annuler")) { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Enregistrer") {
+                        task.title = task.title.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !hasDate {
+                            task.dueDate = nil
+                        }
+                        dismiss()
+                    }
+                    .bold()
+                    .disabled(task.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
+    }
+
+    private var dueDateBinding: Binding<Date> {
+        Binding(
+            get: { task.dueDate ?? Date() },
+            set: { task.dueDate = $0 }
+        )
     }
 }

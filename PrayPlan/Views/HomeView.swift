@@ -92,7 +92,7 @@ struct CurrentSegmentHero: View {
                     .font(.headline)
                 Spacer()
             }
-            .foregroundStyle(segment.color)
+            .foregroundStyle(.primary)
 
             VStack(spacing: 4) {
                 Text(String(localized: "home.nextPrayer", defaultValue: "Prochaine prière"))
@@ -102,14 +102,30 @@ struct CurrentSegmentHero: View {
                     .font(.largeTitle.bold())
                 Text(formattedCountdown)
                     .font(.system(.title2, design: .monospaced).weight(.medium))
-                    .foregroundStyle(segment.color)
+                    .foregroundStyle(segment.bandColor)
             }
 
             ProgressView(value: schedule.progress(of: segment))
-                .tint(segment.color)
+                .tint(segment.bandColor)
         }
         .padding()
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(.secondarySystemGroupedBackground),
+                            segment.softFill
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .strokeBorder(segment.softStroke, lineWidth: 1)
+                )
+        )
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
@@ -164,6 +180,7 @@ struct PrayerDataSourceCard: View {
         VStack(alignment: .leading, spacing: 6) {
             Label(sourceLabel, systemImage: "antenna.radiowaves.left.and.right")
                 .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
 
             if let errorMessage, !errorMessage.isEmpty {
                 Text("Repli automatique sur le calcul local: \(errorMessage)")
@@ -177,7 +194,14 @@ struct PrayerDataSourceCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.secondarySystemGroupedBackground).opacity(0.94))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(Color.primary.opacity(0.05), lineWidth: 1)
+                )
+        )
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -210,7 +234,7 @@ struct PrayerTimeRow: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(isActive ? Color.brandGreen.opacity(0.05) : .clear)
+        .background(isActive ? Color.brandGreen.opacity(0.08) : .clear)
     }
 }
 

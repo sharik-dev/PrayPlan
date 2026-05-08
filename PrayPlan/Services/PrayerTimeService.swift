@@ -5,6 +5,11 @@ import Adhan
 @MainActor
 @Observable
 final class PrayerTimeService {
+    enum LoadPolicy {
+        case preferCache
+        case refresh
+    }
+
     var todaySchedule: DailyPrayerSchedule?
     var weekSchedules: [DailyPrayerSchedule] = []
     var currentSegment: PrayerSegment = .dhuhrToAsr
@@ -16,32 +21,93 @@ final class PrayerTimeService {
 
     private var countdownTimer: Timer?
     private let publicAPI = PublicPrayerTimesAPI()
+    private let cacheStore = PrayerScheduleCacheStore()
     private var activeCalculationID: UInt64 = 0
+    private var loadedRequestKey: String?
+    private var loadedSchedulesExpiry: Date?
 
-    func calculate(for location: CLLocation, settings: UserSettings) async {
+    func calculate(
+        for location: CLLocation,
+        settings: UserSettings,
+        loadPolicy: LoadPolicy = .preferCache
+    ) async {
+        let requestKey = cacheKey(for: location, settings: settings)
+        let expiry = nextDayBoundary(after: Date())
+
+        if loadPolicy == .preferCache, hasFreshInMemorySchedules(for: requestKey, expiry: expiry) {
+            lastErrorMessage = nil
+            isLoading = false
+            refreshCurrentState()
+            return
+        }
+
         activeCalculationID &+= 1
         let calculationID = activeCalculationID
 
         isLoading = true
         lastErrorMessage = nil
+        var restoredFromCache = false
+
+        if let cached = await cacheStore.loadWeek(for: location, settings: settings),
+           calculationID == activeCalculationID {
+            restoredFromCache = true
+            applySchedules(
+                cached.schedules,
+                sourceLabel: cached.sourceLabel,
+                requestKey: requestKey,
+                expiry: expiry
+            )
+            isLoading = false
+
+            if loadPolicy == .preferCache {
+                refreshCurrentState()
+                return
+            }
+        }
 
         do {
             let schedules = try await loadSchedules(for: location, settings: settings)
             guard calculationID == activeCalculationID else { return }
 
-            weekSchedules = schedules
-            dataSourceLabel = settings.prayerDataSource.displayName
+            applySchedules(
+                schedules,
+                sourceLabel: settings.prayerDataSource.displayName,
+                requestKey: requestKey,
+                expiry: expiry
+            )
+            await cacheStore.save(
+                schedules: schedules,
+                for: location,
+                settings: settings,
+                sourceLabel: settings.prayerDataSource.displayName
+            )
         } catch {
-            let schedules = makeLocalSchedules(for: location, settings: settings)
             guard calculationID == activeCalculationID else { return }
 
-            weekSchedules = schedules
-            dataSourceLabel = PrayerTimesDataSource.deviceCalculation.displayName
+            if restoredFromCache {
+                lastErrorMessage = error.localizedDescription
+                isLoading = false
+                refreshCurrentState()
+                return
+            }
+
+            let schedules = makeLocalSchedules(for: location, settings: settings)
+            applySchedules(
+                schedules,
+                sourceLabel: PrayerTimesDataSource.deviceCalculation.displayName,
+                requestKey: requestKey,
+                expiry: expiry
+            )
             lastErrorMessage = error.localizedDescription
+            await cacheStore.save(
+                schedules: schedules,
+                for: location,
+                settings: settings,
+                sourceLabel: PrayerTimesDataSource.deviceCalculation.displayName
+            )
         }
 
         guard calculationID == activeCalculationID else { return }
-        todaySchedule = weekSchedules.first
         isLoading = false
         refreshCurrentState()
     }
@@ -69,6 +135,31 @@ final class PrayerTimeService {
             nextPrayerName = String(localized: "prayer.fajr", defaultValue: "Fajr")
             timeUntilNextPrayer = schedule.fajr.addingTimeInterval(86400).timeIntervalSince(now)
         }
+    }
+
+    private func applySchedules(
+        _ schedules: [DailyPrayerSchedule],
+        sourceLabel: String,
+        requestKey: String,
+        expiry: Date
+    ) {
+        weekSchedules = schedules
+        todaySchedule = schedules.first { Calendar.current.isDateInToday($0.date) } ?? schedules.first
+        dataSourceLabel = sourceLabel
+        loadedRequestKey = requestKey
+        loadedSchedulesExpiry = expiry
+    }
+
+    private func hasFreshInMemorySchedules(for requestKey: String, expiry: Date) -> Bool {
+        guard !weekSchedules.isEmpty,
+              loadedRequestKey == requestKey,
+              (loadedSchedulesExpiry ?? .distantPast) > Date()
+        else { return false }
+
+        if loadedSchedulesExpiry != expiry {
+            loadedSchedulesExpiry = expiry
+        }
+        return true
     }
 
     private func loadSchedules(for location: CLLocation, settings: UserSettings) async throws -> [DailyPrayerSchedule] {
@@ -135,6 +226,195 @@ final class PrayerTimeService {
         case .turkey:                return CalculationMethod.turkey.params
         case .tehran:                return CalculationMethod.tehran.params
         }
+    }
+
+    private func cacheKey(for location: CLLocation, settings: UserSettings) -> String {
+        let lat = roundedCoordinate(location.coordinate.latitude)
+        let lon = roundedCoordinate(location.coordinate.longitude)
+        return [
+            settings.prayerDataSource.rawValue,
+            settings.calculationMethod.rawValue,
+            settings.madhab.rawValue,
+            lat,
+            lon
+        ].joined(separator: "|")
+    }
+
+    private func roundedCoordinate(_ value: Double) -> String {
+        String(format: "%.2f", value)
+    }
+
+    private func nextDayBoundary(after date: Date) -> Date {
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        return Calendar.current.date(byAdding: .day, value: 1, to: startOfDay) ?? date.addingTimeInterval(86_400)
+    }
+}
+
+private actor PrayerScheduleCacheStore {
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
+    private let maxEntries = 12
+    private let groupID = "group.PrayPlan"
+
+    struct CacheHit {
+        let schedules: [DailyPrayerSchedule]
+        let sourceLabel: String
+    }
+
+    func loadWeek(for location: CLLocation, settings: UserSettings) -> CacheHit? {
+        var snapshot = loadSnapshot()
+        let now = Date()
+
+        snapshot.entries.removeAll { $0.cleanupDeadline <= now }
+
+        guard let index = snapshot.entries.firstIndex(where: {
+            $0.requestKey == requestKey(for: location, settings: settings) && $0.expiresAt > now
+        }) else {
+            persist(snapshot)
+            return nil
+        }
+
+        snapshot.entries[index].lastAccessedAt = now
+        let entry = snapshot.entries[index]
+        persist(snapshot)
+
+        let schedules = entry.schedules.map(\.schedule)
+        guard !schedules.isEmpty else { return nil }
+        return CacheHit(schedules: schedules, sourceLabel: entry.sourceLabel)
+    }
+
+    func save(
+        schedules: [DailyPrayerSchedule],
+        for location: CLLocation,
+        settings: UserSettings,
+        sourceLabel: String
+    ) {
+        guard !schedules.isEmpty else { return }
+
+        var snapshot = loadSnapshot()
+        let now = Date()
+        let key = requestKey(for: location, settings: settings)
+        let expiry = nextDayBoundary(after: now)
+        let cleanupDeadline = expiry.addingTimeInterval(2 * 86_400)
+
+        snapshot.entries.removeAll {
+            $0.requestKey == key || $0.cleanupDeadline <= now
+        }
+
+        snapshot.entries.append(
+            PrayerScheduleCacheEntry(
+                requestKey: key,
+                sourceLabel: sourceLabel,
+                createdAt: now,
+                expiresAt: expiry,
+                cleanupDeadline: cleanupDeadline,
+                lastAccessedAt: now,
+                schedules: schedules.map(CachedDailyPrayerSchedule.init(schedule:))
+            )
+        )
+
+        snapshot.entries.sort { $0.lastAccessedAt > $1.lastAccessedAt }
+        if snapshot.entries.count > maxEntries {
+            snapshot.entries = Array(snapshot.entries.prefix(maxEntries))
+        }
+
+        persist(snapshot)
+    }
+
+    private func requestKey(for location: CLLocation, settings: UserSettings) -> String {
+        let lat = roundedCoordinate(location.coordinate.latitude)
+        let lon = roundedCoordinate(location.coordinate.longitude)
+        return [
+            settings.prayerDataSource.rawValue,
+            settings.calculationMethod.rawValue,
+            settings.madhab.rawValue,
+            lat,
+            lon
+        ].joined(separator: "|")
+    }
+
+    private func roundedCoordinate(_ value: Double) -> String {
+        String(format: "%.2f", value)
+    }
+
+    private func nextDayBoundary(after date: Date) -> Date {
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        return Calendar.current.date(byAdding: .day, value: 1, to: startOfDay) ?? date.addingTimeInterval(86_400)
+    }
+
+    private func loadSnapshot() -> PrayerScheduleCacheSnapshot {
+        guard let data = try? Data(contentsOf: cacheFileURL),
+              let snapshot = try? decoder.decode(PrayerScheduleCacheSnapshot.self, from: data) else {
+            return PrayerScheduleCacheSnapshot(entries: [])
+        }
+        return snapshot
+    }
+
+    private func persist(_ snapshot: PrayerScheduleCacheSnapshot) {
+        guard let data = try? encoder.encode(snapshot) else { return }
+
+        let directory = cacheFileURL.deletingLastPathComponent()
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
+        try? data.write(to: cacheFileURL, options: .atomic)
+    }
+
+    private var cacheFileURL: URL {
+        let fileManager = FileManager.default
+        if let container = fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupID) {
+            return container.appendingPathComponent("PrayerScheduleCache.json")
+        }
+
+        let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? fileManager.temporaryDirectory
+        return appSupport
+            .appendingPathComponent("PrayPlan", isDirectory: true)
+            .appendingPathComponent("PrayerScheduleCache.json")
+    }
+}
+
+private struct PrayerScheduleCacheSnapshot: Codable {
+    var entries: [PrayerScheduleCacheEntry]
+}
+
+private struct PrayerScheduleCacheEntry: Codable {
+    var requestKey: String
+    var sourceLabel: String
+    var createdAt: Date
+    var expiresAt: Date
+    var cleanupDeadline: Date
+    var lastAccessedAt: Date
+    var schedules: [CachedDailyPrayerSchedule]
+}
+
+private struct CachedDailyPrayerSchedule: Codable {
+    var date: Date
+    var fajr: Date
+    var sunrise: Date
+    var dhuhr: Date
+    var asr: Date
+    var maghrib: Date
+    var isha: Date
+
+    init(schedule: DailyPrayerSchedule) {
+        date = schedule.date
+        fajr = schedule.fajr
+        sunrise = schedule.sunrise
+        dhuhr = schedule.dhuhr
+        asr = schedule.asr
+        maghrib = schedule.maghrib
+        isha = schedule.isha
+    }
+
+    var schedule: DailyPrayerSchedule {
+        DailyPrayerSchedule(
+            date: date,
+            fajr: fajr,
+            sunrise: sunrise,
+            dhuhr: dhuhr,
+            asr: asr,
+            maghrib: maghrib,
+            isha: isha
+        )
     }
 }
 

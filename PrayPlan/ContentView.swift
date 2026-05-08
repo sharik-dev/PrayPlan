@@ -20,6 +20,7 @@ struct ContentView: View {
             prayerSignature,
             taskSignature,
             habitSignature,
+            goalSignature,
             prayerService.dataSourceLabel,
             currentSettings?.locationName ?? "",
             locationService.cityName
@@ -130,10 +131,25 @@ struct ContentView: View {
         .joined(separator: "|")
     }
 
+    private var goalSignature: String {
+        goals.map {
+            [
+                $0.segmentRaw,
+                $0.themeName,
+                $0.themeIcon,
+                $0.themeColorHex,
+                $0.intention,
+                $0.rulesRaw
+            ].joined(separator: "~")
+        }
+        .joined(separator: "|")
+    }
+
     private func syncWidgetSnapshot() {
         guard let schedule = prayerService.todaySchedule else { return }
 
         let segment = prayerService.currentSegment
+        let currentGoal = goals.first { $0.segment == segment }
         let cityName = locationService.cityName.isEmpty
             ? (currentSettings?.locationName ?? "PrayPlan")
             : locationService.cityName
@@ -190,6 +206,11 @@ struct ContentView: View {
             nextPrayerName: prayerService.nextPrayerName,
             nextPrayerTime: nextPrayerTime,
             dataSourceLabel: prayerService.dataSourceLabel,
+            currentGoalTitle: currentGoal?.themeName ?? "",
+            currentGoalIcon: currentGoal?.themeIcon ?? "",
+            currentGoalColorHex: currentGoal?.themeColorHex ?? "",
+            currentGoalIntention: currentGoal?.intention ?? "",
+            currentGoalRules: currentGoal?.rules ?? [],
             prayers: schedule.allPrayers.map {
                 WidgetPrayerPayload(
                     key: $0.key,
@@ -247,6 +268,11 @@ private struct PrayerWidgetPayload: Codable {
     let nextPrayerName: String
     let nextPrayerTime: Date
     let dataSourceLabel: String
+    let currentGoalTitle: String
+    let currentGoalIcon: String
+    let currentGoalColorHex: String
+    let currentGoalIntention: String
+    let currentGoalRules: [String]
     let prayers: [WidgetPrayerPayload]
     let activities: [WidgetActivityPayload]
 }

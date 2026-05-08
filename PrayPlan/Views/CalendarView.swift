@@ -9,10 +9,12 @@ private let kLabelWidth: CGFloat = 44   // left column for hour labels
 // MARK: – Main View
 
 struct CalendarView: View {
-    @State private var selectedDate = Calendar.current.startOfDay(for: Date())
-    @State private var isDrawMode   = false
+    @State private var selectedDate        = Calendar.current.startOfDay(for: Date())
+    @State private var isDrawMode          = false
+    @State private var isBlockInteracting  = false
     @State private var quickCreate: QuickCreateContext? = nil
     @State private var noteTarget: DayNote? = nil
+    @State private var editingTask: UserTask? = nil
 
     @Query(sort: \UserTask.createdAt, order: .reverse) private var tasks: [UserTask]
     @Query private var habits: [UserHabit]
@@ -68,6 +70,9 @@ struct CalendarView: View {
                     .presentationDetents([.medium, .large])
             }
             .sheet(item: $noteTarget) { NoteEditSheet(note: $0) }
+            .sheet(item: $editingTask) { task in
+                EditTaskView(task: task)
+            }
         }
     }
 
@@ -92,16 +97,18 @@ struct CalendarView: View {
                     onTapMinute: { minute, seg in
                         quickCreate = QuickCreateContext(startMinute: minute, segment: seg)
                     },
+                    onEditTask: { editingTask = $0 },
                     onEditNote: { noteTarget = $0 },
                     onDeleteNote: { context.delete($0) },
                     onToggleTask: { t in
                         t.isCompleted.toggle()
                         t.completedAt = t.isCompleted ? Date() : nil
                     },
-                    onToggleHabit: { h in toggleHabit(h) }
+                    onToggleHabit: { h in toggleHabit(h) },
+                    isBlockInteracting: $isBlockInteracting
                 )
             }
-            .scrollDisabled(isDrawMode)
+            .scrollDisabled(isDrawMode || isBlockInteracting)
             .onAppear {
                 let target = isToday ? max(0, cal.component(.hour, from: Date()) - 2) : 5
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -196,10 +203,12 @@ private struct TimelineGrid: View {
     let isDrawMode: Bool
     let onDrawSelect: (Int, Int, PrayerSegment) -> Void
     let onTapMinute: (Int, PrayerSegment) -> Void
+    let onEditTask: (UserTask) -> Void
     let onEditNote: (DayNote) -> Void
     let onDeleteNote: (DayNote) -> Void
     let onToggleTask: (UserTask) -> Void
     let onToggleHabit: (UserHabit) -> Void
+    @Binding var isBlockInteracting: Bool
 
     @GestureState private var drawGestureState: DrawGestureState = .idle
     private let cal = Calendar.current
@@ -377,7 +386,8 @@ private struct TimelineGrid: View {
                         TaskTimelineChip(
                             task: task,
                             color: seg.bandColor,
-                            onToggle: { onToggleTask(task) }
+                            onToggle: { onToggleTask(task) },
+                            onEdit: { onEditTask(task) }
                         )
                     }
                 }
@@ -524,10 +534,15 @@ private struct TimelineGrid: View {
 
     private var scheduledTaskBlocksLayer: some View {
         GeometryReader { geo in
-            let blockWidth = geo.size.width - kLabelWidth - 12
+            let blockWidth = geo.size.width - kLabelWidth - 14
             ForEach(dayTasks.filter { $0.startMinute >= 0 }) { task in
-                ScheduledTaskBlock(task: task, width: blockWidth)
-                    .offset(x: kLabelWidth + 6)
+                ScheduledTaskBlock(task: task, width: blockWidth, isGlobalInteracting: $isBlockInteracting)
+                    .onTapGesture {
+                        if !isBlockInteracting {
+                            onEditTask(task)
+                        }
+                    }
+                    .offset(x: kLabelWidth + 7)
             }
         }
         .frame(height: CGFloat(24) * kHourHeight)
@@ -596,117 +611,227 @@ private struct TaskTimelineChip: View {
     let task: UserTask
     let color: Color
     let onToggle: () -> Void
+    let onEdit: () -> Void
 
     var body: some View {
-        Button(action: onToggle) {
-            HStack(spacing: 5) {
+        HStack(spacing: 5) {
+            Button(action: onToggle) {
                 Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(task.isCompleted ? Color.brandGreen : color)
-                Text(task.title)
-                    .font(.system(size: 11, weight: .medium))
-                    .strikethrough(task.isCompleted)
-                    .foregroundStyle(task.isCompleted ? .secondary : .primary)
-                    .lineLimit(1)
-                Image(systemName: task.priority.icon)
-                    .font(.system(size: 9))
-                    .foregroundStyle(
-                        task.priority == .high ? .red
-                        : task.priority == .medium ? .blue
-                        : .secondary
-                    )
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
-            .background(task.isCompleted ? Color(.tertiarySystemFill) : color.opacity(0.1))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(task.isCompleted ? Color.secondary.opacity(0.2) : color.opacity(0.4), lineWidth: 1)
-            )
-            .clipShape(Capsule())
+            .buttonStyle(.plain)
+            Text(task.title)
+                .font(.system(size: 11, weight: .medium))
+                .strikethrough(task.isCompleted)
+                .foregroundStyle(task.isCompleted ? .secondary : .primary)
+                .lineLimit(1)
+            Image(systemName: task.priority.icon)
+                .font(.system(size: 9))
+                .foregroundStyle(
+                    task.priority == .high ? .red
+                    : task.priority == .medium ? .blue
+                    : .secondary
+                )
         }
-        .buttonStyle(.plain)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .background(task.isCompleted ? Color(.tertiarySystemFill) : color.opacity(0.1))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(task.isCompleted ? Color.secondary.opacity(0.2) : color.opacity(0.4), lineWidth: 1)
+        )
+        .clipShape(Capsule())
+        .contentShape(Capsule())
+        .onTapGesture(perform: onEdit)
     }
 }
 
 // MARK: – Scheduled Task Block
 
+/// Gesture state shared by both move and resize interactions.
+private enum BlockInteractionState: Equatable {
+    case idle
+    case pressing           // long-press in progress, not yet dragging
+    case dragging(CGFloat)  // translation (pts)
+
+    var isActive: Bool { if case .idle = self { return false }; return true }
+    var translation: CGFloat { if case .dragging(let t) = self { return t }; return 0 }
+}
+
 private struct ScheduledTaskBlock: View {
     @Bindable var task: UserTask
     let width: CGFloat
+    @Binding var isGlobalInteracting: Bool
 
-    @GestureState private var moveDelta: CGFloat   = 0
-    @GestureState private var resizeDelta: CGFloat = 0
+    // Move gesture state (long press 0.28s → drag)
+    @GestureState private var moveState:   BlockInteractionState = .idle
+    // Resize gesture state (long press 0.12s → drag)
+    @GestureState private var resizeState: BlockInteractionState = .idle
+
+    @State private var isLifted  = false
+    @State private var isResizing = false
 
     private var yBase: CGFloat { CGFloat(task.startMinute) / 60.0 * kHourHeight }
     private var hBase: CGFloat { max(kHourHeight * 0.5, CGFloat(task.durationMinutes) / 60.0 * kHourHeight) }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            // Background + content
-            RoundedRectangle(cornerRadius: 7)
-                .fill(task.segment.bandColor.opacity(task.isCompleted ? 0.4 : 0.88))
-                .overlay(blockContent)
-                // Move gesture on the block body
-                .gesture(
-                    DragGesture(minimumDistance: 8, coordinateSpace: .local)
-                        .updating($moveDelta) { v, s, _ in s = v.translation.height }
-                        .onEnded { v in
-                            let delta = Int(round(v.translation.height / kHourHeight * 60 / 15) * 15)
-                            task.startMinute = max(0, min(23 * 60, task.startMinute + delta))
-                        }
-                )
-                .onTapGesture {
-                    task.isCompleted.toggle()
-                    task.completedAt = task.isCompleted ? Date() : nil
-                }
+        let liveY = yBase + moveState.translation
+        let liveH = max(kHourHeight * 0.5, hBase + resizeState.translation)
+        let anyActive = moveState.isActive || resizeState.isActive
 
-            // Resize handle — rendered on top, intercepts drags in the bottom strip
-            resizeHandle
+        ZStack(alignment: .topLeading) {
+            // Ghost outline at original position while dragging
+            if moveState.isActive {
+                RoundedRectangle(cornerRadius: 8)
+                    .strokeBorder(task.segment.bandColor.opacity(0.35), lineWidth: 1.5)
+                    .frame(width: width, height: hBase)
+                    .offset(y: yBase)
+                    .allowsHitTesting(false)
+            }
+
+            // Live block
+            VStack(spacing: 0) {
+                // ── Move handle strip (top 22pt)
+                moveHandleStrip
+                // ── Main content (flex)
+                blockContentArea
+                    .frame(maxHeight: .infinity)
+                // ── Resize handle strip (bottom 22pt)
+                resizeHandleStrip
+            }
+            .frame(width: width, height: liveH)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                task.segment.bandColor.opacity(task.isCompleted ? 0.4 : 0.92),
+                                task.segment.bandColor.opacity(task.isCompleted ? 0.3 : 0.72)
+                            ],
+                            startPoint: .topLeading, endPoint: .bottomTrailing
+                        )
+                    )
+                    // Left accent bar
+                    .overlay(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.white.opacity(0.25))
+                            .frame(width: 3)
+                    }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .shadow(
+                color: task.segment.bandColor.opacity(anyActive ? 0.45 : 0.18),
+                radius: anyActive ? 16 : 4,
+                x: 0, y: anyActive ? 8 : 2
+            )
+            .scaleEffect(anyActive ? 1.025 : 1.0, anchor: .top)
+            .offset(y: liveY)
+            .zIndex(anyActive ? 100 : 2)
+            .animation(.spring(response: 0.28, dampingFraction: 0.72), value: anyActive)
         }
-        .frame(width: width, height: max(kHourHeight * 0.5, hBase + resizeDelta))
-        .offset(y: yBase + moveDelta)
-        .zIndex(2)
+        // Sync global scroll-lock binding
+        .onChange(of: moveState) { _, s in
+            isGlobalInteracting = s.isActive || resizeState.isActive
+            withAnimation(.spring(response: 0.22, dampingFraction: 0.7)) { isLifted = s.isActive }
+        }
+        .onChange(of: resizeState) { _, s in
+            isGlobalInteracting = moveState.isActive || s.isActive
+            isResizing = s.isActive
+        }
     }
 
-    private var blockContent: some View {
+    // MARK: – Sub-views
+
+    private var moveHandleStrip: some View {
+        HStack(spacing: 4) {
+            ForEach(0..<3, id: \.self) { _ in
+                Capsule()
+                    .fill(Color.white.opacity(isLifted ? 0.8 : 0.45))
+                    .frame(width: 14, height: 2.5)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 22)
+        .contentShape(Rectangle())
+        // Long press (0.28s) → drag to MOVE
+        .gesture(
+            LongPressGesture(minimumDuration: 0.28)
+                .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .global))
+                .updating($moveState) { value, state, _ in
+                    switch value {
+                    case .first(true):           state = .pressing
+                    case .second(true, let d?):  state = .dragging(d.translation.height)
+                    default:                     state = .idle
+                    }
+                }
+                .onEnded { value in
+                    if case .second(true, let drag?) = value {
+                        let delta = Int(round(drag.translation.height / kHourHeight * 60 / 15) * 15)
+                        task.startMinute = max(0, min(23 * 60, task.startMinute + delta))
+                    }
+                    isGlobalInteracting = false
+                }
+        )
+    }
+
+    private var blockContentArea: some View {
         VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 4) {
+            HStack(spacing: 5) {
                 Image(systemName: task.isCompleted ? "checkmark.circle.fill" : task.priority.icon)
                     .font(.system(size: 9, weight: .bold))
                 Text(task.title)
                     .font(.caption.bold())
-                    .lineLimit(2)
+                    .lineLimit(hBase > kHourHeight ? 2 : 1)
+                    .strikethrough(task.isCompleted)
             }
             .foregroundStyle(.white)
-            if hBase >= kHourHeight * 0.75 {
+            if hBase >= kHourHeight * 0.8 {
                 Text(timeRangeLabel)
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.75))
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(.white.opacity(0.72))
             }
         }
-        .padding(.horizontal, 6)
-        .padding(.vertical, 4)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 3)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .allowsHitTesting(false)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            withAnimation(.spring(response: 0.2)) {
+                task.isCompleted.toggle()
+                task.completedAt = task.isCompleted ? Date() : nil
+            }
+        }
     }
 
-    private var resizeHandle: some View {
+    private var resizeHandleStrip: some View {
         HStack {
             Spacer()
             Capsule()
-                .fill(Color.white.opacity(0.6))
-                .frame(width: 30, height: 4)
+                .fill(Color.white.opacity(isResizing ? 0.9 : 0.5))
+                .frame(width: 32, height: 3.5)
             Spacer()
         }
-        .frame(height: 20)
+        .frame(height: 22)
+        .background(Color.white.opacity(0.001)) // extend hit area
         .contentShape(Rectangle())
-        .highPriorityGesture(
-            DragGesture(minimumDistance: 4, coordinateSpace: .local)
-                .updating($resizeDelta) { v, s, _ in s = v.translation.height }
-                .onEnded { v in
-                    let delta = Int(round(v.translation.height / kHourHeight * 60 / 15) * 15)
-                    task.durationMinutes = max(15, task.durationMinutes + delta)
+        // Long press (0.12s) → drag to RESIZE
+        .gesture(
+            LongPressGesture(minimumDuration: 0.12)
+                .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .global))
+                .updating($resizeState) { value, state, _ in
+                    switch value {
+                    case .first(true):           state = .pressing
+                    case .second(true, let d?):  state = .dragging(d.translation.height)
+                    default:                     state = .idle
+                    }
+                }
+                .onEnded { value in
+                    if case .second(true, let drag?) = value {
+                        let delta = Int(round(drag.translation.height / kHourHeight * 60 / 15) * 15)
+                        task.durationMinutes = max(15, task.durationMinutes + delta)
+                    }
+                    isGlobalInteracting = false
                 }
         )
     }
@@ -714,8 +839,8 @@ private struct ScheduledTaskBlock: View {
     private var timeRangeLabel: String {
         let sh = task.startMinute / 60, sm = task.startMinute % 60
         let end = task.startMinute + task.durationMinutes
-        let eh = min(23, end / 60), em = end % 60
-        return String(format: "%02d:%02d → %02d:%02d", sh, sm, eh, em)
+        let eh  = min(23, end / 60), em = end % 60
+        return String(format: "%02d:%02d – %02d:%02d", sh, sm, eh, em)
     }
 }
 
