@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-enum CalculationMethodOption: String, CaseIterable, Identifiable {
+enum CalculationMethodOption: String, CaseIterable, Identifiable, Sendable {
     case muslimWorldLeague     = "muslimWorldLeague"
     case northAmerica          = "northAmerica"
     case egyptian              = "egyptian"
@@ -35,7 +35,30 @@ enum CalculationMethodOption: String, CaseIterable, Identifiable {
     }
 }
 
-enum MadhabOption: String, CaseIterable, Identifiable {
+enum PrayerTimesDataSource: String, CaseIterable, Identifiable, Sendable {
+    case deviceCalculation = "deviceCalculation"
+    case alAdhanAPI        = "alAdhanAPI"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .deviceCalculation: return "Calcul local (Adhan)"
+        case .alAdhanAPI:        return "API publique AlAdhan"
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .deviceCalculation:
+            return "Calculé directement sur l’appareil à partir de la position."
+        case .alAdhanAPI:
+            return "Récupéré via l’API publique AlAdhan, sans clé API."
+        }
+    }
+}
+
+enum MadhabOption: String, CaseIterable, Identifiable, Sendable {
     case shafi  = "shafi"
     case hanafi = "hanafi"
 
@@ -83,6 +106,7 @@ enum AzanSound: String, CaseIterable, Identifiable {
 
 @Model
 final class UserSettings {
+    var prayerDataSourceRaw: String    = PrayerTimesDataSource.deviceCalculation.rawValue
     var calculationMethodRaw: String = CalculationMethodOption.muslimWorldLeague.rawValue
     var madhabRaw: String            = MadhabOption.shafi.rawValue
     var azanSoundRaw: String         = AzanSound.azan.rawValue
@@ -94,6 +118,11 @@ final class UserSettings {
     var createdAt: Date              = Date()
 
     init() {}
+
+    var prayerDataSource: PrayerTimesDataSource {
+        get { PrayerTimesDataSource(rawValue: prayerDataSourceRaw) ?? .deviceCalculation }
+        set { prayerDataSourceRaw = newValue.rawValue }
+    }
 
     var calculationMethod: CalculationMethodOption {
         get { CalculationMethodOption(rawValue: calculationMethodRaw) ?? .muslimWorldLeague }

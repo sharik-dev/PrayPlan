@@ -110,11 +110,41 @@ struct DailyPrayerSchedule {
 }
 
 extension Color {
-    static let fajrColor    = Color(red: 0.10, green: 0.14, blue: 0.49)
-    static let sunriseColor = Color(red: 0.90, green: 0.32, blue: 0.00)
-    static let dhuhrColor   = Color(red: 0.80, green: 0.52, blue: 0.00)
-    static let asrColor     = Color(red: 0.96, green: 0.60, blue: 0.00)
-    static let maghribColor = Color(red: 0.42, green: 0.11, blue: 0.60)
-    static let ishaColor    = Color(red: 0.05, green: 0.05, blue: 0.17)
+    static let fajrColor    = Color(red: 0.12, green: 0.15, blue: 0.55)   // deep cobalt
+    static let sunriseColor = Color(red: 0.78, green: 0.26, blue: 0.02)   // rich burnt sienna
+    static let dhuhrColor   = Color(red: 0.70, green: 0.44, blue: 0.00)   // deep amber
+    static let asrColor     = Color(red: 0.85, green: 0.54, blue: 0.05)   // warm gold
+    static let maghribColor = Color(red: 0.44, green: 0.08, blue: 0.60)   // rich violet
+    static let ishaColor    = Color(red: 0.07, green: 0.07, blue: 0.22)   // deep midnight
     static let brandGreen   = Color(red: 0.18, green: 0.49, blue: 0.20)
+}
+
+extension PrayerSegment {
+    var bannerGradient: LinearGradient {
+        switch self {
+        case .fajrToSunrise:
+            return LinearGradient(colors: [Color(red: 0.08, green: 0.10, blue: 0.42), Color(red: 0.20, green: 0.26, blue: 0.70)], startPoint: .leading, endPoint: .trailing)
+        case .sunriseToDhuhr:
+            return LinearGradient(colors: [Color(red: 0.70, green: 0.22, blue: 0.00), Color(red: 0.95, green: 0.42, blue: 0.06)], startPoint: .leading, endPoint: .trailing)
+        case .dhuhrToAsr:
+            return LinearGradient(colors: [Color(red: 0.62, green: 0.38, blue: 0.00), Color(red: 0.88, green: 0.58, blue: 0.06)], startPoint: .leading, endPoint: .trailing)
+        case .asrToMaghrib:
+            return LinearGradient(colors: [Color(red: 0.80, green: 0.48, blue: 0.00), Color(red: 1.00, green: 0.72, blue: 0.10)], startPoint: .leading, endPoint: .trailing)
+        case .maghribToIsha:
+            return LinearGradient(colors: [Color(red: 0.36, green: 0.04, blue: 0.52), Color(red: 0.62, green: 0.14, blue: 0.80)], startPoint: .leading, endPoint: .trailing)
+        case .ishaTofajr:
+            return LinearGradient(colors: [Color(red: 0.04, green: 0.04, blue: 0.16), Color(red: 0.12, green: 0.12, blue: 0.32)], startPoint: .leading, endPoint: .trailing)
+        }
+    }
+
+    var bandColor: Color {
+        switch self {
+        case .fajrToSunrise:  return Color(red: 0.12, green: 0.15, blue: 0.55)
+        case .sunriseToDhuhr: return Color(red: 0.78, green: 0.26, blue: 0.02)
+        case .dhuhrToAsr:     return Color(red: 0.70, green: 0.44, blue: 0.00)
+        case .asrToMaghrib:   return Color(red: 0.85, green: 0.54, blue: 0.05)
+        case .maghribToIsha:  return Color(red: 0.44, green: 0.08, blue: 0.60)
+        case .ishaTofajr:     return Color(red: 0.07, green: 0.07, blue: 0.22)
+        }
+    }
 }

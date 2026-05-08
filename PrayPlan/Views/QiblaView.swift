@@ -83,6 +83,8 @@ struct QiblaView: View {
 }
 
 struct CompassRing: View {
+    private let directions = ["N", "E", "S", "O"]
+
     var body: some View {
         ZStack {
             Circle()
@@ -98,20 +100,22 @@ struct CompassRing: View {
                     .rotationEffect(.degrees(angle))
             }
 
-            ForEach(["N", "E", "S", "O"], id: \.self) { dir in
-                let angle: Double
-                switch dir {
-                case "N": angle = 0
-                case "E": angle = 90
-                case "S": angle = 180
-                default:  angle = 270
-                }
+            ForEach(Array(directions.enumerated()), id: \.offset) { _, dir in
                 Text(dir)
                     .font(.caption.bold())
                     .foregroundStyle(dir == "N" ? .red : .primary)
                     .offset(y: -108)
-                    .rotationEffect(.degrees(angle))
+                    .rotationEffect(.degrees(angle(for: dir)))
             }
+        }
+    }
+
+    private func angle(for direction: String) -> Double {
+        switch direction {
+        case "N": return 0
+        case "E": return 90
+        case "S": return 180
+        default:  return 270
         }
     }
 }

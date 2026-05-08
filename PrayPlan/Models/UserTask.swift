@@ -44,6 +44,8 @@ final class UserTask {
     var dueDate: Date?       = nil
     var createdAt: Date      = Date()
     var completedAt: Date?   = nil
+    var startMinute: Int     = -1   // minutes from midnight; -1 = unscheduled
+    var durationMinutes: Int = 60
 
     init(title: String,
          segment: PrayerSegment,

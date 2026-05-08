@@ -26,6 +26,10 @@ struct HomeView: View {
                             nextPrayerName: prayerService.nextPrayerName,
                             timeRemaining: prayerService.timeUntilNextPrayer
                         )
+                        PrayerDataSourceCard(
+                            sourceLabel: prayerService.dataSourceLabel,
+                            errorMessage: prayerService.lastErrorMessage
+                        )
                         PrayerTimeline(schedule: schedule, currentSegment: prayerService.currentSegment)
                     } else {
                         LoadingCard()
@@ -38,10 +42,15 @@ struct HomeView: View {
             .navigationBarTitleDisplayMode(.large)
         }
         .onAppear { bootstrap() }
+        .onChange(of: currentSettings?.createdAt) { _, _ in
+            bootstrap()
+        }
         .onChange(of: locationService.currentLocation) { _, location in
             guard let loc = location, let s = currentSettings else { return }
-            prayerService.calculate(for: loc, settings: s)
-            notifService.scheduleForWeek(schedules: prayerService.weekSchedules, settings: s)
+            Task {
+                await prayerService.calculate(for: loc, settings: s)
+                notifService.scheduleForWeek(schedules: prayerService.weekSchedules, settings: s)
+            }
         }
         .onAppear { prayerService.startCountdown() }
         .onDisappear { prayerService.stopCountdown() }
@@ -50,15 +59,21 @@ struct HomeView: View {
     private func bootstrap() {
         locationService.requestAndFetch()
         if let loc = locationService.currentLocation, let s = currentSettings {
-            prayerService.calculate(for: loc, settings: s)
+            Task {
+                await prayerService.calculate(for: loc, settings: s)
+                notifService.scheduleForWeek(schedules: prayerService.weekSchedules, settings: s)
+            }
         } else if let s = currentSettings, !s.useAutoLocation {
             let fakeLoc = CLLocationFromSettings(s)
-            prayerService.calculate(for: fakeLoc, settings: s)
+            Task {
+                await prayerService.calculate(for: fakeLoc, settings: s)
+                notifService.scheduleForWeek(schedules: prayerService.weekSchedules, settings: s)
+            }
         }
     }
 }
 
-private func CLLocationFromSettings(_ s: UserSettings) -> CLLocation {
+func CLLocationFromSettings(_ s: UserSettings) -> CLLocation {
     CLLocation(latitude: s.locationLat, longitude: s.locationLon)
 }
 
@@ -138,6 +153,32 @@ struct PrayerTimeline: View {
         case .maghribToIsha:  return key == "maghrib"
         case .ishaTofajr:     return key == "isha"
         }
+    }
+}
+
+struct PrayerDataSourceCard: View {
+    let sourceLabel: String
+    let errorMessage: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label(sourceLabel, systemImage: "antenna.radiowaves.left.and.right")
+                .font(.subheadline.weight(.semibold))
+
+            if let errorMessage, !errorMessage.isEmpty {
+                Text("Repli automatique sur le calcul local: \(errorMessage)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Source actuelle des horaires de prière.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
 

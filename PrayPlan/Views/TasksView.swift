@@ -90,7 +90,7 @@ struct TaskRowView: View {
             Button(action: onToggle) {
                 Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
-                    .foregroundStyle(task.isCompleted ? .brandGreen : .secondary)
+                    .foregroundStyle(task.isCompleted ? Color.brandGreen : .secondary)
             }
             .buttonStyle(.plain)
 
@@ -107,7 +107,7 @@ struct TaskRowView: View {
                 }
 
                 if let due = task.dueDate {
-                    Label(due, style: .date)
+                    Text(due, style: .date)
                         .font(.caption2)
                         .foregroundStyle(.orange)
                 }

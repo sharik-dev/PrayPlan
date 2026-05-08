@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import CoreLocation
 
 struct SettingsView: View {
     @Query private var settings: [UserSettings]
@@ -18,6 +19,7 @@ struct SettingsView: View {
                         locationSection(s)
                         calculationSection(s)
                         alertsSection(s)
+                        qiblaSection
                         aboutSection
                     }
                 } else {
@@ -35,7 +37,7 @@ struct SettingsView: View {
                 String(localized: "settings.autoLocation", defaultValue: "Localisation automatique"),
                 isOn: Binding(
                     get: { s.useAutoLocation },
-                    set: { s.useAutoLocation = $0 }
+                    set: { updateAutoLocation($0, settings: s) }
                 )
             )
             if !locationService.cityName.isEmpty {
@@ -50,6 +52,23 @@ struct SettingsView: View {
     @ViewBuilder
     private func calculationSection(_ s: UserSettings) -> some View {
         Section(String(localized: "settings.calculation", defaultValue: "Calcul")) {
+            Picker(
+                String(localized: "settings.dataSource", defaultValue: "Source des horaires"),
+                selection: Binding(
+                    get: { s.prayerDataSource },
+                    set: { s.prayerDataSource = $0; recalculate(s) }
+                )
+            ) {
+                ForEach(PrayerTimesDataSource.allCases) { source in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(source.displayName).tag(source)
+                        Text(source.subtitle)
+                    }
+                    .tag(source)
+                }
+            }
+            .pickerStyle(.navigationLink)
+
             Picker(
                 String(localized: "settings.method", defaultValue: "Méthode"),
                 selection: Binding(
@@ -121,6 +140,20 @@ struct SettingsView: View {
         }
     }
 
+    @ViewBuilder
+    private var qiblaSection: some View {
+        Section(String(localized: "settings.tools", defaultValue: "Outils")) {
+            NavigationLink {
+                QiblaView()
+            } label: {
+                Label(
+                    String(localized: "tab.qibla", defaultValue: "Qibla"),
+                    systemImage: "location.north.line.fill"
+                )
+            }
+        }
+    }
+
     private var aboutSection: some View {
         Section(String(localized: "settings.about", defaultValue: "À propos")) {
             LabeledContent("Version", value: "1.0")
@@ -128,6 +161,11 @@ struct SettingsView: View {
                 String(localized: "settings.engine", defaultValue: "Moteur de calcul"),
                 value: "Adhan"
             )
+            Link(
+                "API publique AlAdhan",
+                destination: URL(string: "https://aladhan.com/prayer-times-api")!
+            )
+            .font(.footnote)
             Link(
                 String(localized: "settings.openSource", defaultValue: "Adhan open-source library"),
                 destination: URL(string: "https://github.com/batoulapps/adhan-swift")!
@@ -137,9 +175,32 @@ struct SettingsView: View {
     }
 
     private func recalculate(_ s: UserSettings) {
-        guard let loc = locationService.currentLocation else { return }
-        prayerService.calculate(for: loc, settings: s)
-        reschedule(s)
+        let location = locationService.currentLocation ?? CLLocationFromSettings(s)
+        Task {
+            await prayerService.calculate(for: location, settings: s)
+            reschedule(s)
+        }
+    }
+
+    private func updateAutoLocation(_ isEnabled: Bool, settings s: UserSettings) {
+        s.useAutoLocation = isEnabled
+
+        if isEnabled {
+            locationService.requestAndFetch()
+            if let location = locationService.currentLocation {
+                Task {
+                    await prayerService.calculate(for: location, settings: s)
+                    reschedule(s)
+                }
+            }
+        } else {
+            locationService.cityName = s.locationName
+            let location = CLLocationFromSettings(s)
+            Task {
+                await prayerService.calculate(for: location, settings: s)
+                reschedule(s)
+            }
+        }
     }
 
     private func reschedule(_ s: UserSettings) {

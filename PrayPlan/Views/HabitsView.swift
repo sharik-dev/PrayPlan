@@ -111,7 +111,7 @@ struct HabitRowView: View {
             if isCompletedToday {
                 Image(systemName: "checkmark")
                     .font(.caption.bold())
-                    .foregroundStyle(.brandGreen)
+                    .foregroundStyle(Color.brandGreen)
             }
         }
         .padding(.vertical, 2)
@@ -122,10 +122,11 @@ struct AddHabitView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
 
-    @State private var title     = ""
-    @State private var iconName  = "star.fill"
-    @State private var segment   = PrayerSegment.fajrToSunrise
-    @State private var frequency = HabitFrequency.daily
+    @State private var title      = ""
+    @State private var iconName   = "star.fill"
+    @State private var segment    = PrayerSegment.fajrToSunrise
+    @State private var frequency  = HabitFrequency.daily
+    @State private var customDays = Set<Int>()
     @State private var showIconPicker = false
 
     private let iconOptions = [
@@ -179,13 +180,21 @@ struct AddHabitView: View {
                     .pickerStyle(.navigationLink)
                 }
 
-                Section(String(localized: "addHabit.section.frequency", defaultValue: "Fréquence")) {
+                Section(String(localized: "addHabit.section.frequency", defaultValue: "Récurrence")) {
                     Picker(String(localized: "addHabit.frequency", defaultValue: "Fréquence"), selection: $frequency) {
                         ForEach(HabitFrequency.allCases) { f in
                             Text(f.displayName).tag(f)
                         }
                     }
                     .pickerStyle(.segmented)
+                    .onChange(of: frequency) { _, new in
+                        if new != .custom { customDays = [] }
+                    }
+
+                    if frequency == .custom {
+                        CustomDaysPicker(selectedDays: $customDays)
+                            .padding(.vertical, 4)
+                    }
                 }
             }
             .navigationTitle(String(localized: "addHabit.title.nav", defaultValue: "Nouvelle habitude"))
@@ -209,6 +218,7 @@ struct AddHabitView: View {
             segment: segment,
             frequency: frequency
         )
+        if frequency == .custom { habit.customDays = customDays }
         context.insert(habit)
         dismiss()
     }

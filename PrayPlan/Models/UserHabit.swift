@@ -5,23 +5,26 @@ enum HabitFrequency: String, CaseIterable, Identifiable, Codable {
     case daily    = "daily"
     case weekdays = "weekdays"
     case weekends = "weekends"
+    case custom   = "custom"
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
         case .daily:    return String(localized: "frequency.daily",    defaultValue: "Quotidien")
-        case .weekdays: return String(localized: "frequency.weekdays", defaultValue: "Jours ouvrables")
+        case .weekdays: return String(localized: "frequency.weekdays", defaultValue: "Semaine")
         case .weekends: return String(localized: "frequency.weekends", defaultValue: "Week-end")
+        case .custom:   return String(localized: "frequency.custom",   defaultValue: "Personnalisé")
         }
     }
 
-    func isActive(on date: Date) -> Bool {
+    func isActive(on date: Date, customDays: Set<Int> = []) -> Bool {
         let weekday = Calendar.current.component(.weekday, from: date)
         switch self {
         case .daily:    return true
         case .weekdays: return (2...6).contains(weekday)
         case .weekends: return weekday == 1 || weekday == 7
+        case .custom:   return customDays.isEmpty || customDays.contains(weekday)
         }
     }
 }
@@ -36,6 +39,7 @@ final class UserHabit {
     var colorHex: String   = "#2E7D32"
     var createdAt: Date    = Date()
     var isArchived: Bool   = false
+    var customDaysRaw: String = ""
 
     @Relationship(deleteRule: .cascade)
     var completions: [HabitCompletion] = []
@@ -64,9 +68,16 @@ final class UserHabit {
         set { frequencyRaw = newValue.rawValue }
     }
 
-    func isActiveToday() -> Bool {
-        frequency.isActive(on: Date())
+    var customDays: Set<Int> {
+        get { Set(customDaysRaw.split(separator: ",").compactMap { Int($0) }) }
+        set { customDaysRaw = newValue.sorted().map(String.init).joined(separator: ",") }
     }
+
+    func isActiveOn(_ date: Date) -> Bool {
+        frequency.isActive(on: date, customDays: customDays)
+    }
+
+    func isActiveToday() -> Bool { isActiveOn(Date()) }
 
     func isCompleted(on date: Date) -> Bool {
         let normalized = Calendar.current.startOfDay(for: date)

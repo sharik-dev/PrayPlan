@@ -3,13 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8083B8A3915E3B22B0A22A32 /* PrayPlanApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C2AFE8C742EE48BF269182 /* PrayPlanApp.swift */; };
 		80311CF269B28FFEF99C4449 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F9B85B4C738067646D40923 /* ContentView.swift */; };
-		B5AA2E2E9CE50CBC659DD6AA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 95F2D051E9AB60F66C1354C2 /* Assets.xcassets */; };
+		8083B8A3915E3B22B0A22A32 /* PrayPlanApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C2AFE8C742EE48BF269182 /* PrayPlanApp.swift */; };
+		98F9602C2FAE58F60041D933 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98F9602B2FAE58F60041D933 /* WidgetKit.framework */; };
+		98F9602E2FAE58F60041D933 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 98F9602D2FAE58F60041D933 /* SwiftUI.framework */; };
+		98F9603B2FAE58F60041D933 /* PrayPlanWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 98F960292FAE58F60041D933 /* PrayPlanWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A282A7EE8DA0CB2B4D618B5B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDFD24A0FBA53295AFF2178C /* Preview Assets.xcassets */; };
 		AA200001000000000000001A /* PrayerSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100001000000000000001A /* PrayerSegment.swift */; };
 		AA200002000000000000001A /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100002000000000000001A /* UserSettings.swift */; };
@@ -25,30 +27,90 @@
 		AA200012000000000000001A /* QiblaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100012000000000000001A /* QiblaView.swift */; };
 		AA200013000000000000001A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100013000000000000001A /* SettingsView.swift */; };
 		AA200014000000000000001A /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100014000000000000001A /* Shared.swift */; };
+		AA200015000000000000001A /* AppBlockingProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100015000000000000001A /* AppBlockingProfile.swift */; };
+		AA200016000000000000001A /* AppBlockingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100016000000000000001A /* AppBlockingService.swift */; };
+		AA200017000000000000001A /* AppBlockingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100017000000000000001A /* AppBlockingView.swift */; };
+		AA200019000000000000001A /* DayNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100019000000000000001A /* DayNote.swift */; };
+		AA200020000000000000001A /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100020000000000000001A /* CalendarView.swift */; };
+		AA200021000000000000001A /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100021000000000000001A /* AnalyticsView.swift */; };
+		AA200022000000000000001A /* SegmentGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100022000000000000001A /* SegmentGoal.swift */; };
+		AA200023000000000000001A /* GoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100023000000000000001A /* GoalsView.swift */; };
 		AA400003000000000000001A /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = AA400002000000000000001A /* Adhan */; };
+		B5AA2E2E9CE50CBC659DD6AA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 95F2D051E9AB60F66C1354C2 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		98F960392FAE58F60041D933 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A17D8A63618C056BB4D71C54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 98F960282FAE58F60041D933;
+			remoteInfo = PrayPlanWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		98F9603C2FAE58F60041D933 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				98F9603B2FAE58F60041D933 /* PrayPlanWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		2737DEE416FA4ABF59631DC0 /* PrayPlan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PrayPlan.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F4C2AFE8C742EE48BF269182 /* PrayPlanApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PrayPlanApp.swift"; sourceTree = "<group>"; };
-		0F9B85B4C738067646D40923 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView.swift"; sourceTree = "<group>"; };
-		95F2D051E9AB60F66C1354C2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Assets.xcassets"; sourceTree = "<group>"; };
+		0F9B85B4C738067646D40923 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2737DEE416FA4ABF59631DC0 /* PrayPlan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PrayPlan.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		95F2D051E9AB60F66C1354C2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		98F960292FAE58F60041D933 /* PrayPlanWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PrayPlanWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		98F9602B2FAE58F60041D933 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		98F9602D2FAE58F60041D933 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		98F960892FAE594A0041D933 /* PrayPlanWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PrayPlanWidgetExtension.entitlements; sourceTree = "<group>"; };
+		AA100001000000000000001A /* PrayerSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerSegment.swift; sourceTree = "<group>"; };
+		AA100002000000000000001A /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		AA100003000000000000001A /* UserTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTask.swift; sourceTree = "<group>"; };
+		AA100004000000000000001A /* UserHabit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHabit.swift; sourceTree = "<group>"; };
+		AA100005000000000000001A /* HabitCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitCompletion.swift; sourceTree = "<group>"; };
+		AA100006000000000000001A /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		AA100007000000000000001A /* PrayerTimeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerTimeService.swift; sourceTree = "<group>"; };
+		AA100008000000000000001A /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		AA100009000000000000001A /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		AA100010000000000000001A /* TasksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksView.swift; sourceTree = "<group>"; };
+		AA100011000000000000001A /* HabitsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitsView.swift; sourceTree = "<group>"; };
+		AA100012000000000000001A /* QiblaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QiblaView.swift; sourceTree = "<group>"; };
+		AA100013000000000000001A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA100014000000000000001A /* Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared.swift; sourceTree = "<group>"; };
+		AA100015000000000000001A /* AppBlockingProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBlockingProfile.swift; sourceTree = "<group>"; };
+		AA100016000000000000001A /* AppBlockingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBlockingService.swift; sourceTree = "<group>"; };
+		AA100017000000000000001A /* AppBlockingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBlockingView.swift; sourceTree = "<group>"; };
+		AA100018000000000000001A /* PrayPlan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PrayPlan.entitlements; sourceTree = "<group>"; };
+		AA100019000000000000001A /* DayNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayNote.swift; sourceTree = "<group>"; };
+		AA100020000000000000001A /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
+		AA100021000000000000001A /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
+		AA100022000000000000001A /* SegmentGoal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentGoal.swift; sourceTree = "<group>"; };
+		AA100023000000000000001A /* GoalsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsView.swift; sourceTree = "<group>"; };
 		BDFD24A0FBA53295AFF2178C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		AA100001000000000000001A /* PrayerSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PrayerSegment.swift"; sourceTree = "<group>"; };
-		AA100002000000000000001A /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserSettings.swift"; sourceTree = "<group>"; };
-		AA100003000000000000001A /* UserTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserTask.swift"; sourceTree = "<group>"; };
-		AA100004000000000000001A /* UserHabit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserHabit.swift"; sourceTree = "<group>"; };
-		AA100005000000000000001A /* HabitCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HabitCompletion.swift"; sourceTree = "<group>"; };
-		AA100006000000000000001A /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocationService.swift"; sourceTree = "<group>"; };
-		AA100007000000000000001A /* PrayerTimeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PrayerTimeService.swift"; sourceTree = "<group>"; };
-		AA100008000000000000001A /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationService.swift"; sourceTree = "<group>"; };
-		AA100009000000000000001A /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeView.swift"; sourceTree = "<group>"; };
-		AA100010000000000000001A /* TasksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TasksView.swift"; sourceTree = "<group>"; };
-		AA100011000000000000001A /* HabitsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HabitsView.swift"; sourceTree = "<group>"; };
-		AA100012000000000000001A /* QiblaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QiblaView.swift"; sourceTree = "<group>"; };
-		AA100013000000000000001A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView.swift"; sourceTree = "<group>"; };
-		AA100014000000000000001A /* Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shared.swift"; sourceTree = "<group>"; };
+		F4C2AFE8C742EE48BF269182 /* PrayPlanApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayPlanApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		98F9603F2FAE58F60041D933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 98F960282FAE58F60041D933 /* PrayPlanWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		98F9602F2FAE58F60041D933 /* PrayPlanWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (98F9603F2FAE58F60041D933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = PrayPlanWidget; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		6F869BC68BEFA1FE00143294 /* Frameworks */ = {
@@ -59,46 +121,40 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		98F960262FAE58F60041D933 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98F9602E2FAE58F60041D933 /* SwiftUI.framework in Frameworks */,
+				98F9602C2FAE58F60041D933 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		C7E9224900DFA0225E483924 = {
-			isa = PBXGroup;
-			children = (
-				4A8F7C0923AA5D151AC5192C /* PrayPlan */,
-				E417074EFC1126DABEBA6F9B /* Products */,
-			);
-			sourceTree = "<group>";
-		};
-		E417074EFC1126DABEBA6F9B /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				2737DEE416FA4ABF59631DC0 /* PrayPlan.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		4A8F7C0923AA5D151AC5192C /* PrayPlan */ = {
 			isa = PBXGroup;
 			children = (
 				F4C2AFE8C742EE48BF269182 /* PrayPlanApp.swift */,
 				0F9B85B4C738067646D40923 /* ContentView.swift */,
+				AA100018000000000000001A /* PrayPlan.entitlements */,
 				AA300001000000000000001A /* Models */,
 				AA300002000000000000001A /* Services */,
 				AA300003000000000000001A /* Views */,
 				95F2D051E9AB60F66C1354C2 /* Assets.xcassets */,
 				B8EE2489FA2215BE70E5895C /* Preview Content */,
 			);
-			path = "PrayPlan";
+			path = PrayPlan;
 			sourceTree = "<group>";
 		};
-		B8EE2489FA2215BE70E5895C /* Preview Content */ = {
+		98F9602A2FAE58F60041D933 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				BDFD24A0FBA53295AFF2178C /* Preview Assets.xcassets */,
+				98F9602B2FAE58F60041D933 /* WidgetKit.framework */,
+				98F9602D2FAE58F60041D933 /* SwiftUI.framework */,
 			);
-			name = "Preview Content";
-			path = "Preview Content";
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		AA300001000000000000001A /* Models */ = {
@@ -109,6 +165,9 @@
 				AA100003000000000000001A /* UserTask.swift */,
 				AA100004000000000000001A /* UserHabit.swift */,
 				AA100005000000000000001A /* HabitCompletion.swift */,
+				AA100015000000000000001A /* AppBlockingProfile.swift */,
+				AA100019000000000000001A /* DayNote.swift */,
+				AA100022000000000000001A /* SegmentGoal.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -119,6 +178,7 @@
 				AA100006000000000000001A /* LocationService.swift */,
 				AA100007000000000000001A /* PrayerTimeService.swift */,
 				AA100008000000000000001A /* NotificationService.swift */,
+				AA100016000000000000001A /* AppBlockingService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -132,8 +192,40 @@
 				AA100012000000000000001A /* QiblaView.swift */,
 				AA100013000000000000001A /* SettingsView.swift */,
 				AA100014000000000000001A /* Shared.swift */,
+				AA100017000000000000001A /* AppBlockingView.swift */,
+				AA100020000000000000001A /* CalendarView.swift */,
+				AA100021000000000000001A /* AnalyticsView.swift */,
+				AA100023000000000000001A /* GoalsView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		B8EE2489FA2215BE70E5895C /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				BDFD24A0FBA53295AFF2178C /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		C7E9224900DFA0225E483924 = {
+			isa = PBXGroup;
+			children = (
+				98F960892FAE594A0041D933 /* PrayPlanWidgetExtension.entitlements */,
+				4A8F7C0923AA5D151AC5192C /* PrayPlan */,
+				98F9602F2FAE58F60041D933 /* PrayPlanWidget */,
+				98F9602A2FAE58F60041D933 /* Frameworks */,
+				E417074EFC1126DABEBA6F9B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E417074EFC1126DABEBA6F9B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2737DEE416FA4ABF59631DC0 /* PrayPlan.app */,
+				98F960292FAE58F60041D933 /* PrayPlanWidgetExtension.appex */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -146,18 +238,42 @@
 				D5E7D05AC124CF4183571662 /* Sources */,
 				6F869BC68BEFA1FE00143294 /* Frameworks */,
 				9A76DC83D8FDC11F45FA8CAE /* Resources */,
+				98F9603C2FAE58F60041D933 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				98F9603A2FAE58F60041D933 /* PBXTargetDependency */,
+			);
+			name = PrayPlan;
+			packageProductDependencies = (
+				AA400002000000000000001A /* Adhan */,
+			);
+			productName = PrayPlan;
+			productReference = 2737DEE416FA4ABF59631DC0 /* PrayPlan.app */;
+			productType = "com.apple.product-type.application";
+		};
+		98F960282FAE58F60041D933 /* PrayPlanWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 98F960402FAE58F60041D933 /* Build configuration list for PBXNativeTarget "PrayPlanWidgetExtension" */;
+			buildPhases = (
+				98F960252FAE58F60041D933 /* Sources */,
+				98F960262FAE58F60041D933 /* Frameworks */,
+				98F960272FAE58F60041D933 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "PrayPlan";
-			packageProductDependencies = (
-				AA400002000000000000001A /* Adhan */,
+			fileSystemSynchronizedGroups = (
+				98F9602F2FAE58F60041D933 /* PrayPlanWidget */,
 			);
-			productName = "PrayPlan";
-			productReference = 2737DEE416FA4ABF59631DC0 /* PrayPlan.app */;
-			productType = "com.apple.product-type.application";
+			name = PrayPlanWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = PrayPlanWidgetExtension;
+			productReference = 98F960292FAE58F60041D933 /* PrayPlanWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -166,11 +282,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1540;
+				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					4A8F7C0923AA5D151AC5192CT = {
 						CreatedOnToolsVersion = 15.4;
+					};
+					98F960282FAE58F60041D933 = {
+						CreatedOnToolsVersion = 26.4.1;
 					};
 				};
 			};
@@ -193,11 +312,19 @@
 			projectRoot = "";
 			targets = (
 				4A8F7C0923AA5D151AC5192CT /* PrayPlan */,
+				98F960282FAE58F60041D933 /* PrayPlanWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		98F960272FAE58F60041D933 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9A76DC83D8FDC11F45FA8CAE /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -210,6 +337,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		98F960252FAE58F60041D933 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D5E7D05AC124CF4183571662 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -230,12 +364,221 @@
 				AA200012000000000000001A /* QiblaView.swift in Sources */,
 				AA200013000000000000001A /* SettingsView.swift in Sources */,
 				AA200014000000000000001A /* Shared.swift in Sources */,
+				AA200015000000000000001A /* AppBlockingProfile.swift in Sources */,
+				AA200016000000000000001A /* AppBlockingService.swift in Sources */,
+				AA200017000000000000001A /* AppBlockingView.swift in Sources */,
+				AA200019000000000000001A /* DayNote.swift in Sources */,
+				AA200020000000000000001A /* CalendarView.swift in Sources */,
+				AA200021000000000000001A /* AnalyticsView.swift in Sources */,
+				AA200022000000000000001A /* SegmentGoal.swift in Sources */,
+				AA200023000000000000001A /* GoalsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		98F9603A2FAE58F60041D933 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 98F960282FAE58F60041D933 /* PrayPlanWidgetExtension */;
+			targetProxy = 98F960392FAE58F60041D933 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		0F990A0092C95830996FE77A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PrayPlan/PrayPlan.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"PrayPlan/Preview Content\"";
+				DEVELOPMENT_TEAM = 2XR666D9B2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "PrayPlan utilise votre position pour calculer les heures de prière locales.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.prayplan;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		98F9603D2FAE58F60041D933 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CODE_SIGN_ENTITLEMENTS = PrayPlanWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2XR666D9B2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PrayPlanWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PrayPlanWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.prayplan.PrayPlanWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		98F9603E2FAE58F60041D933 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CODE_SIGN_ENTITLEMENTS = PrayPlanWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2XR666D9B2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PrayPlanWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PrayPlanWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.prayplan.PrayPlanWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B8EE2489FA2215BE70E5895C2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PrayPlan/PrayPlan.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"PrayPlan/Preview Content\"";
+				DEVELOPMENT_TEAM = 2XR666D9B2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "PrayPlan utilise votre position pour calculer les heures de prière locales.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.prayplan;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E4BA3E746C576C196706B222 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_LOOPS = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		EB3BA7789617119F3FC425B3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -298,135 +641,32 @@
 			};
 			name = Debug;
 		};
-		E4BA3E746C576C196706B222 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_LOOPS = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MTL_FAST_MATH = YES;
-				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		B8EE2489FA2215BE70E5895C2 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"PrayPlan/Preview Content\"";
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "PrayPlan utilise votre position pour calculer les heures de prière locales.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.prayplan";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		0F990A0092C95830996FE77A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"PrayPlan/Preview Content\"";
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "PrayPlan utilise votre position pour calculer les heures de prière locales.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.prayplan";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E417074EFC1126DABEBA6F9B2 /* Build configuration list for PBXProject "PrayPlan" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				EB3BA7789617119F3FC425B3 /* Debug */,
-				E4BA3E746C576C196706B222 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		38119928C3339E85E2C08B3C /* Build configuration list for PBXNativeTarget "PrayPlan" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B8EE2489FA2215BE70E5895C2 /* Debug */,
 				0F990A0092C95830996FE77A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		98F960402FAE58F60041D933 /* Build configuration list for PBXNativeTarget "PrayPlanWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				98F9603D2FAE58F60041D933 /* Debug */,
+				98F9603E2FAE58F60041D933 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E417074EFC1126DABEBA6F9B2 /* Build configuration list for PBXProject "PrayPlan" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB3BA7789617119F3FC425B3 /* Debug */,
+				E4BA3E746C576C196706B222 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -451,7 +691,6 @@
 			productName = Adhan;
 		};
 /* End XCSwiftPackageProductDependency section */
-
 	};
 	rootObject = A17D8A63618C056BB4D71C54 /* Project object */;
 }
